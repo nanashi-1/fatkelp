@@ -69,7 +69,7 @@ sudo fatkelp -x 15
 Run the following command as root(`su` or `sudo`)
 
 ~~~ bash
-curl https://raw.githubusercontent.com/algames2019/fatkelp/main/installer.sh > installer.sh; chmod +x installer.sh; ./installer.sh
+curl https://raw.githubusercontent.com/algames2019/fatkelp/main/installer.sh > installer.sh; chmod +x installer.sh; sudo ./installer.sh
 ~~~
 
 ### Install dependencies
