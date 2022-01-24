@@ -1,0 +1,64 @@
+#!/bin/python
+from evdev import list_devices, InputDevice, categorize, UInput, ecodes, InputEvent
+from argparse import ArgumentParser
+from sys import exit
+
+default_cofig = '/usr/share/fatkelp/global.fk'
+
+# read arguments
+parser = ArgumentParser(prog='fatkelp', description='forwards /dev/input/eventX to /dev/uinput and also remap keys')
+
+parser.add_argument('-x', '--eventX', dest='x', type=int, metavar='event', help='sets the /dev/input/eventX that is to be forwarded to /dev/uinput')
+parser.add_argument('-l', '--list', dest='l', action='store_true', help='list all devices in /dev/input')
+parser.add_argument('-k', '--listen', dest='k', action='store_true', help='listen to /dev/input/eventX')
+parser.add_argument('-f', '--config-file', dest='f', default=default_cofig, help=f'select a config file (default: {default_cofig})')
+args = parser.parse_args()
+
+if args.l:
+    devices = map(InputDevice, list_devices())
+    for device in devices:
+        print(device.path.replace('/dev/input/event', ''), '\t', device.name)
+        device.close()
+    exit()
+
+if args.k:
+    device = InputDevice('/dev/input/event'+str(args.x))
+    print(f'Listening to {device.name} at {device.path}\n')
+    try:
+        for event in device.read_loop():
+            print(categorize(event))
+    except KeyboardInterrupt:
+        print('\nListening Closed...')
+    device.close()
+    exit()
+
+# read and parse config
+try:
+    config = open(args.f, 'r')
+    c = config.read()
+    configuration = {a.split(':')[0]:int(a.split(':')[1]) for a in c.split('\n')} if ':' in c else {}
+    if configuration == {}:
+        print('Config Empty\nContinuing...\n')
+    config.close()
+except IndexError:
+    print(f'Not a valid config file')
+    exit()
+
+
+device = InputDevice(f'/dev/input/event{args.x}')
+print(f'Redirecting {device.name} at {device.path} to /dev/uinput\n')
+ui = UInput()
+try:
+    for event in device.read_loop():
+        if str(event.code) in configuration:
+            e = InputEvent(event.sec, event.usec, event.type, configuration[str(event.code)], event.value)
+            ui.write_event(e)
+            ui.syn()
+        else:
+            ui.write_event(event)
+            ui.syn()
+except KeyboardInterrupt:
+    print('\nRedirecting Closed...')
+    device.close()
+    ui.close()
+    exit()
