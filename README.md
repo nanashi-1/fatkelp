@@ -4,6 +4,10 @@
 
 ## Usage
 
+### Redirect second keyboard to /dev/uinput
+
+Find the id of the second keyboard
+
 ## Installation
 
 Run the following command as root(`su` or `sudo`)
