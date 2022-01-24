@@ -36,7 +36,7 @@ if args.k:
 try:
     config = open(args.f, 'r')
     c = config.read()
-    configuration = {a.split(':')[0]:int(a.split(':')[1]) for a in c.split('\n')} if ':' in c else {}
+    configuration = {a.split(':')[0] if ':' in a else 'n':int(a.split(':')[1]) if ':' in a else 'n' for a in c.split('\n')} if ':' in c else {}
     if configuration == {}:
         print('Config Empty\nContinuing...\n')
     config.close()
