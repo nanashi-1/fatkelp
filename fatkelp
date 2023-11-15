@@ -44,6 +44,9 @@ except IndexError:
     print(f'Not a valid config file')
     exit()
 
+if 'x' not in args:
+    print(parser.usage)
+    exit(1)
 
 device = InputDevice(f'/dev/input/event{args.x}')
 print(f'Redirecting {device.name} at {device.path} to /dev/uinput\n')
