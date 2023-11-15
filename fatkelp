@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python
 from evdev import list_devices, InputDevice, categorize, UInput, ecodes, InputEvent
 from argparse import ArgumentParser
 from sys import exit
